@@ -14,7 +14,7 @@ export default function ThemeChange({ className }: { className?: string }) {
   if (!mounted) {
     return (
       <Button
-        className='hover:!bg-toggle scale-150 !border-none !bg-transparent !text-white'
+        className=' scale-100 !border-none !text-white'
         variant='outline'
         size='icon'
         aria-label='Toggle theme'
@@ -29,7 +29,7 @@ export default function ThemeChange({ className }: { className?: string }) {
 
   return (
     <Button
-      className={`hover:!bg-toggle scale-150 !border-none !bg-transparent !text-white ${className}`}
+      className={` scale-100 !border-none !text-white ${className}`}
       variant='outline'
       size='icon'
       aria-label='Toggle theme'

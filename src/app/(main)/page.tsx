@@ -6,6 +6,7 @@ import FeaturesSection from './_components/landingPage/features-section'
 import HeroSection from './_components/landingPage/hero-section'
 import { cookies } from 'next/headers'
 import { AUTH } from '~/constants'
+import MenuHuongTre from './_components/menu_huong_tre/menu'
 
 export default async function Home() {
   const cookieStore = await cookies()
@@ -13,12 +14,13 @@ export default async function Home() {
   const token = cookieStore.get(AUTH.token)?.value
   return (
     <div className='min-h-screen'>
-      <HeroSection />
+      {/* <HeroSection />
       <FeaturesSection />
       <PricingSection />
       <TestimonialsSection />
       <FAQSection />
-      <CTASection />
+      <CTASection /> */}
+      <MenuHuongTre/>
     </div>
   )
 }
