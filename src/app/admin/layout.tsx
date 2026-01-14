@@ -6,6 +6,7 @@ import { AuthProvider } from '../_components/auth-context'
 import { cookies } from 'next/headers'
 import { AUTH } from '~/constants'
 import { User } from '#/user'
+import { ThemeProvider } from '../_components/theme-provider'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies()
@@ -15,10 +16,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ) as User | undefined
 
   return (
-    <AntdThemeProvider>
-      <AuthProvider token={token} user={user}>
-        <SideBarAdmin user={user as User}>{children}</SideBarAdmin>
-      </AuthProvider>
-    </AntdThemeProvider>
+    <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+      <AntdThemeProvider>
+        <AuthProvider token={token} user={user}>
+          <SideBarAdmin user={user as User}>{children}</SideBarAdmin>
+        </AuthProvider>
+      </AntdThemeProvider>
+    </ThemeProvider>
   )
 }

@@ -3,7 +3,6 @@ import './globals.css'
 import { cn } from '~/utils/cn'
 import { Toaster } from '~/components/ui/sonner'
 import { eremitageFont } from '~/fonts/eremitage'
-import { ThemeProvider } from './_components/theme-provider'
 import ScrollToTop from './_components/scroll-to-top'
 
 export const metadata: Metadata = {
@@ -19,10 +18,8 @@ export default async function RootLayout({
   return (
     <html lang='en' className='light' style={{ colorScheme: 'light' }} suppressHydrationWarning>
       <body className={cn('antialiased', eremitageFont.variable)} suppressHydrationWarning>
-        <div className=''>
-          <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+        <div className='bg-gray-100'>
             {children}
-          </ThemeProvider>
         </div>
         <ScrollToTop />
         <Toaster richColors theme='light' />

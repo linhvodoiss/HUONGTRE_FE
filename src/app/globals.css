@@ -74,7 +74,6 @@ input[type='number'] {
 :root {
   /**************** change color you want here ***********/
   --color-primary-rgb: 0, 92, 118;
-
   --color-primary-base: rgba(var(--color-primary-rgb), 1);
   --color-primary-base-hover: rgba(var(--color-primary-rgb), 0.85);
   --color-white-rgba: rgba(255, 255, 255, 1);
@@ -166,6 +165,25 @@ input[type='number'] {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@utility flex-cc {
+  @apply flex items-center justify-center;
+}
+
+@utility flex-bc {
+  @apply flex items-center justify-between;
+}
+
+@utility flex-ec {
+  @apply flex items-center justify-end;
+}
+
+@utility center-x {
+  @apply left-1/2 -translate-x-1/2;
+}
+
+@utility center-y {
+  @apply top-1/2 -translate-y-1/2;
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -182,4 +200,8 @@ body.doc-page #header {
 
 body.doc-page #footer {
 display: none;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
 }
