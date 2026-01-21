@@ -1,12 +1,8 @@
-import PricingSection from './_components/landingPage/pricing-section'
-import FAQSection from './_components/landingPage/faq-section'
-import CTASection from './_components/landingPage/cta-section'
-import TestimonialsSection from './_components/landingPage/testimonials-section'
-import FeaturesSection from './_components/landingPage/features-section'
-import HeroSection from './_components/landingPage/hero-section'
+
 import { cookies } from 'next/headers'
 import { AUTH } from '~/constants'
-import MenuHuongTre from './_components/menu_huong_tre/menu'
+
+import Link from 'next/link'
 
 export default async function Home() {
   const cookieStore = await cookies()
@@ -14,13 +10,8 @@ export default async function Home() {
   const token = cookieStore.get(AUTH.token)?.value
   return (
     <div className='min-h-screen'>
-      {/* <HeroSection />
-      <FeaturesSection />
-      <PricingSection />
-      <TestimonialsSection />
-      <FAQSection />
-      <CTASection /> */}
-      <MenuHuongTre/>
+      <h1 className='text-black font-bold text-2xl'>Xin chào tất cả các bạn, mình tên là Quang</h1>
+      <Link href='/menu' className='px-4 py-2 font-semibold text-base text-black bg-gray-200 rounded-md mt-4 inline-block'>menu</Link>
     </div>
   )
 }

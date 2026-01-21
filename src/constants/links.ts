@@ -45,4 +45,5 @@ export const LINKS = {
   account_dashboard: '/account/dashboard',
   options_show_select: '/options/list',
   update_avatar: '/files/avatar',
+  menu:'/categories/menu'
 }

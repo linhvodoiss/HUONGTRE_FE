@@ -19,6 +19,7 @@ const PUBLIC_PATHS = [
   'register',
   'about',
   'doc',
+  'menu',
   'active',
   'forget',
   'new-password',
