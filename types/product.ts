@@ -1,13 +1,14 @@
 import { Key } from "react"
-import { ProductResponse } from "./product"
+import { OptionGroupResponse } from "./option-groups"
 
-export type CategoryResponse = {
+export type ProductResponse = {
   id: Key
+  price:number
   name: string
   description: string
   imageUrl:string
   isActive: boolean
   createdAt: string
   updatedAt: string
-  products:ProductResponse[]
+  optionGroups:OptionGroupResponse[]
 }

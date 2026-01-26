@@ -7,10 +7,6 @@ import {
   DropboxOutlined,
   InboxOutlined,
   SlidersOutlined,
-  AppstoreOutlined,
-  FileTextOutlined,
-  TagsOutlined,
-  BranchesOutlined,
 } from '@ant-design/icons'
 import Link from 'next/link'
 
@@ -83,32 +79,6 @@ export default function SideBarAdmin({ children, user }: { children: ReactNode; 
                   key: 'option',
                   icon: <SlidersOutlined />,
                   label: <Link href='/admin/option'>Option</Link>,
-                  className: '!text-secondary-gray',
-                },
-              ],
-            },
-            {
-              key: 'resource',
-              icon: <AppstoreOutlined />,
-              label: 'Resource ',
-              className: '!text-secondary-gray',
-              children: [
-                {
-                  key: 'doc',
-                  icon: <FileTextOutlined />,
-                  label: <Link href='/admin/doc'>Doc</Link>,
-                  className: '!text-secondary-gray',
-                },
-                {
-                  key: 'category',
-                  icon: <TagsOutlined />,
-                  label: <Link href='/admin/category'>Category</Link>,
-                  className: '!text-secondary-gray',
-                },
-                {
-                  key: 'version',
-                  icon: <BranchesOutlined />,
-                  label: <Link href='/admin/version'>Version</Link>,
                   className: '!text-secondary-gray',
                 },
               ],
