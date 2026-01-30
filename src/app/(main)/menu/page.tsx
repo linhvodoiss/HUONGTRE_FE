@@ -3,6 +3,7 @@ import MenuHuongTre from './_components/menu'
 import { LINKS } from '~/constants/links'
 import http from '~/utils/http'
 import { CategoryResponse } from '#/category'
+import { MenuStyled } from './styled'
 
 
 export default async function MenuPage() {
@@ -13,8 +14,8 @@ export default async function MenuPage() {
   })
 
   return (
-    <div className='min-h-screen'>
+    <MenuStyled className='min-h-screen'>
       <MenuHuongTre data={data as CategoryResponse[]}/>
-    </div>
+    </MenuStyled>
   )
 }

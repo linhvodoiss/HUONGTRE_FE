@@ -2,6 +2,7 @@ import { ProductResponse } from '#/product'
 import { ChevronLeft } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
+import { QuantityProduct } from './quantity-product'
 
 type SelectedOptions = {
   [groupId: string]: string[] // SINGLE: mảng 1 phần tử, MULTI: nhiều
@@ -16,6 +17,7 @@ export default function ProductDetailModal({
   selectedProduct: ProductResponse
 }) {
   const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>({})
+const [selectedQuantity, setSelectedQuantity] = useState(1)
 
   const handleSelectOption = (groupId: string, optionId: string, selectType: 'SINGLE' | 'MULTIPLE') => {
     setSelectedOptions(prev => {
@@ -40,7 +42,7 @@ export default function ProductDetailModal({
       >
         <ChevronLeft size={24} strokeWidth={3} />
       </button>
-      <div className='mx-auto mt-8 flex h-[90%] w-[90%] items-center gap-6'>
+      <div className='mx-auto mt-8 flex h-[90%] w-[90%] items-center gap-6 relative'>
         <div className='h-full w-[45%] overflow-hidden rounded-md'>
           <Image
             src='/images/tra-sua-tran-chau-hoang-kim.png'
@@ -50,7 +52,7 @@ export default function ProductDetailModal({
             alt='image product'
           />
         </div>
-        <div className='w-[55%] self-start'>
+        <div className='w-[55%] self-start h-[80%] min-h-[80%] overflow-y-scroll side-right relative'>
           {selectedProduct?.optionGroups?.map(optionGroup => (
             <div key={optionGroup.id} className='mb-6'>
               <p className='text-xl font-semibold uppercase'>
@@ -90,7 +92,15 @@ export default function ProductDetailModal({
               <hr className='bg-gray-00 mt-2 h-0.5 w-full' />
             </div>
           ))}
+         
+          <div>
+            <textarea name="" id="" placeholder='Nhập ghi chú' className='p-2 border w-full outline-0 bg-gray-100 rounded-md min-h-32'></textarea>
+          </div>
         </div>
+          <div className='absolute right-0 bottom-1/10 w-[55%] font-semibold text-white flex items-center justify-between'>
+             <QuantityProduct maxQuantity={10} onQuantityChange={setSelectedQuantity} />
+            <button className='px-4 py-2 bg-pink-400 rounded-md cursor-pointer hover:bg-pink-500 transition-all'>Thêm vào giỏ hàng</button>
+          </div>
       </div>
     </div>
   )
