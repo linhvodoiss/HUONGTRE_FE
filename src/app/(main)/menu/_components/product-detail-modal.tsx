@@ -52,7 +52,7 @@ const [selectedQuantity, setSelectedQuantity] = useState(1)
             alt='image product'
           />
         </div>
-        <div className='w-[55%] self-start h-[80%] min-h-[80%] overflow-y-scroll side-right relative'>
+        <div className='w-[55%] self-start h-[80%] min-h-[80%] overflow-y-scroll side-right relative pl-2'>
           {selectedProduct?.optionGroups?.map(optionGroup => (
             <div key={optionGroup.id} className='mb-6'>
               <p className='text-xl font-semibold uppercase'>
@@ -69,13 +69,14 @@ const [selectedQuantity, setSelectedQuantity] = useState(1)
                   const checked = selectedOptions[groupId]?.includes(optionId) ?? false
 
                   return (
-                    <div className='flex flex-col w-1/2  gap-2 py-2' key={optionId}>
+                    <div className='flex flex-col w-1/2 gap-2 py-2' key={optionId}>
                       <label className='block cursor-pointer'>
                         <input
                           type={optionGroup.selectType === 'SINGLE' ? 'radio' : 'checkbox'}
                           name={groupId}
                           checked={checked}
                           onChange={() => handleSelectOption(groupId, optionId, optionGroup.selectType)}
+                         className="accent-pink-500 scale-125 mr-2"
                         />
 
                         <span>
