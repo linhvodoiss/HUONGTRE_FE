@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import ProductDetailModal from './product-detail-modal'
+import { formatCurrency } from '~/utils/price-convert'
 
 export default function MenuHuongTre({ data }: { data: CategoryResponse[] }) {
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -113,7 +114,7 @@ export default function MenuHuongTre({ data }: { data: CategoryResponse[] }) {
                   <div className='w-full flex-1'>
                     <p className='font-semibold capitalize'>{itemProduct.name}</p>
                     <p className='line-clamp-2 text-sm text-gray-500'>{itemProduct.description}</p>
-                    <p className='py-3 text-sm font-semibold text-pink-400'>{itemProduct.price}đ</p>
+                    <p className='py-3 text-sm font-semibold text-pink-400'>{formatCurrency(itemProduct.price)}</p>
                   </div>
 
                   <button className='relative h-8 w-8 self-end rounded-full bg-pink-400 text-2xl text-white'>
@@ -129,7 +130,21 @@ export default function MenuHuongTre({ data }: { data: CategoryResponse[] }) {
       </div>
 
       <div className='col-span-4'>
-        <div className='sticky top-4 rounded-md bg-white px-5 py-3'>Giỏ hàng</div>
+        <div className='sticky top-4 rounded-md bg-white px-5 pt-3 pb-6'>
+
+          <div className='w-full aspect-[832/600] overflow-hidden rounded-md'>
+            <Image
+              src='/images/cart_cat.jpg'
+              width={832}
+              height={600}
+              className='size-full object-cover'
+              alt='image product'
+            />
+          </div>
+          <div className='mt-3'>
+            <p className='text-lg font-semibold text-center text-gray-500'>Chưa có sản phẩm trong giỏ hàng</p>
+          </div>
+        </div>
       </div>
       {!!selectedProduct && (
         <ProductDetailModal closeModal={closeModal} isVisible={isVisible} selectedProduct={selectedProduct} />

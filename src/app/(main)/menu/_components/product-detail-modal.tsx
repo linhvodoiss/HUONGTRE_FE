@@ -1,11 +1,12 @@
 import { ProductResponse } from '#/product'
 import { ChevronLeft } from 'lucide-react'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { QuantityProduct } from './quantity-product'
+import { formatCurrency } from '~/utils/price-convert'
 
 type SelectedOptions = {
-  [groupId: string]: string[] // SINGLE: mảng 1 phần tử, MULTI: nhiều
+  [groupId: string]: string[]
 }
 export default function ProductDetailModal({
   closeModal,
@@ -17,7 +18,20 @@ export default function ProductDetailModal({
   selectedProduct: ProductResponse
 }) {
   const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>({})
-const [selectedQuantity, setSelectedQuantity] = useState(1)
+  const [selectedQuantity, setSelectedQuantity] = useState(1)
+
+  useEffect(() => {
+    if (selectedProduct?.optionGroups) {
+      const defaultOptions: SelectedOptions = {}
+      selectedProduct.optionGroups.forEach(group => {
+        if (group.selectType === 'SINGLE' && group.options && group.options.length > 0) {
+          defaultOptions[String(group.id)] = [String(group.options[0].id)]
+        }
+      })
+      setSelectedOptions(defaultOptions)
+    }
+    setSelectedQuantity(1)
+  }, [selectedProduct])
 
   const handleSelectOption = (groupId: string, optionId: string, selectType: 'SINGLE' | 'MULTIPLE') => {
     setSelectedOptions(prev => {
@@ -32,6 +46,28 @@ const [selectedQuantity, setSelectedQuantity] = useState(1)
       }
     })
   }
+  const totalPrice = useMemo(() => {
+    if (!selectedProduct) return 0
+
+    const basePrice = selectedProduct.price || 0
+    let toppingsPrice = 0
+
+    Object.entries(selectedOptions).forEach(([groupId, optionIds]) => {
+      const group = selectedProduct.optionGroups?.find(g => String(g.id) === groupId)
+      if (group) {
+        optionIds.forEach(optionId => {
+          const option = group.options?.find(o => String(o.id) === optionId)
+          if (option) {
+            toppingsPrice += (option.price as number) || 0
+          }
+        })
+      }
+    })
+
+    return (basePrice + toppingsPrice) * selectedQuantity
+  }, [selectedProduct, selectedOptions, selectedQuantity])
+
+
   return (
     <div
       className={`fixed inset-0 z-50 bg-white transition-all duration-300 ease-out ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'} `}
@@ -76,7 +112,7 @@ const [selectedQuantity, setSelectedQuantity] = useState(1)
                           name={groupId}
                           checked={checked}
                           onChange={() => handleSelectOption(groupId, optionId, optionGroup.selectType)}
-                         className="accent-pink-500 scale-125 mr-2"
+                          className="accent-pink-500 scale-125 mr-2"
                         />
 
                         <span>
@@ -84,7 +120,7 @@ const [selectedQuantity, setSelectedQuantity] = useState(1)
                         </span>
                       </label>
                       {(option.price as number) > 0 && (
-                        <span className='ml-1 block text-gray-500'>+{option.price}đ</span>
+                        <span className='ml-1 block text-gray-500'>+{formatCurrency(option.price as number)}</span>
                       )}
                     </div>
                   )
@@ -93,15 +129,15 @@ const [selectedQuantity, setSelectedQuantity] = useState(1)
               <hr className='bg-gray-00 mt-2 h-0.5 w-full' />
             </div>
           ))}
-         
+
           <div>
             <textarea name="" id="" placeholder='Nhập ghi chú' className='p-2 border w-full outline-0 bg-gray-100 rounded-md min-h-32'></textarea>
           </div>
         </div>
-          <div className='absolute right-0 bottom-1/10 w-[55%] font-semibold text-white flex items-center justify-between'>
-             <QuantityProduct maxQuantity={10} onQuantityChange={setSelectedQuantity} />
-            <button className='px-4 py-2 bg-pink-400 rounded-md cursor-pointer hover:bg-pink-500 transition-all'>Thêm vào giỏ hàng</button>
-          </div>
+        <div className='absolute right-0 bottom-1/10 w-[55%] font-semibold text-white flex items-center justify-between'>
+          <QuantityProduct maxQuantity={10} onQuantityChange={setSelectedQuantity} />
+          <button className='px-4 py-2 bg-pink-400 rounded-md cursor-pointer hover:bg-pink-500 transition-all'>Thêm vào giỏ hàng: + {formatCurrency(totalPrice)}</button>
+        </div>
       </div>
     </div>
   )
