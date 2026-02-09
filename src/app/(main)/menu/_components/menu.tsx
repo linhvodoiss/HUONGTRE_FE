@@ -1,22 +1,50 @@
 'use client'
 import { CategoryResponse } from '#/category'
 import { ProductResponse } from '#/product'
-import { Search } from 'lucide-react'
+import { Search, Trash2, Pencil } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 import ProductDetailModal from './product-detail-modal'
 import { formatCurrency } from '~/utils/price-convert'
+import { useCart, type CartItem } from '~/contexts/cart-context'
 
 export default function MenuHuongTre({ data }: { data: CategoryResponse[] }) {
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const [selectedProduct, setSelectedProduct] = useState<ProductResponse | null>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const [editingCartIndex, setEditingCartIndex] = useState<number | null>(null)
+  const router = useRouter()
+  
+  // Sử dụng Cart Context
+  const { cart, addToCart, removeFromCart, updateCartItem, clearCart, totalCartPrice } = useCart()
+
+  const editCartItem = (index: number) => {
+    const item = cart[index]
+    setSelectedProduct(item.product)
+    setEditingCartIndex(index)
+    setTimeout(() => setIsVisible(true), 10)
+  }
+
+  const handleUpdateCartItem = (updatedItem: CartItem) => {
+    if (editingCartIndex === null) return
+    updateCartItem(editingCartIndex, updatedItem)
+    closeModal()
+  }
 
   const closeModal = () => {
     setIsVisible(false)
-    setTimeout(() => setSelectedProduct(null), 300)
+    setTimeout(() => {
+      setSelectedProduct(null)
+      setEditingCartIndex(null)
+    }, 300)
   }
+
+  const handleContinue = () => {
+    router.push('/cart')
+  }
+
 
   return (
     <div className='grid grid-cols-12 gap-4 bg-gray-100'>
@@ -130,24 +158,109 @@ export default function MenuHuongTre({ data }: { data: CategoryResponse[] }) {
       </div>
 
       <div className='col-span-4'>
-        <div className='sticky top-4 rounded-md bg-white px-5 pt-3 pb-6'>
-
-          <div className='w-full aspect-[832/600] overflow-hidden rounded-md'>
-            <Image
-              src='/images/cart_cat.jpg'
-              width={832}
-              height={600}
-              className='size-full object-cover'
-              alt='image product'
-            />
-          </div>
-          <div className='mt-3'>
-            <p className='text-lg font-semibold text-center text-gray-500'>Chưa có sản phẩm trong giỏ hàng</p>
-          </div>
+        <div className='sticky top-4 rounded-md bg-white px-5 pb-6'>
+          {cart.length === 0 ? (
+            <>
+              <div className='w-full aspect-[832/600] overflow-hidden rounded-md'>
+                <Image
+                  src='/images/cart_cat.jpg'
+                  width={832}
+                  height={600}
+                  className='size-full object-cover'
+                  alt='image product'
+                />
+              </div>
+              <div className='mt-3'>
+                <p className='text-lg font-semibold text-center text-gray-500'>Chưa có sản phẩm trong giỏ hàng</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className='flex justify-between items-center mb-4 pt-3'>
+                <h2 className='text-xl font-semibold'>Giỏ hàng của bạn</h2>
+                <button
+                  onClick={clearCart}
+                  className='p-2 text-red-500 hover:bg-red-50 rounded transition-colors'
+                  title='Xóa tất cả'
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+              <div className='max-h-[500px] overflow-y-auto'>
+                {cart.map((item, index) => (
+                  <div key={index} className='mb-4 pb-4 border-b'>
+                    <div className='flex justify-between items-start'>
+                      <div className='flex-1'>
+                        <p className='font-semibold'>{item.product.name}</p>
+                        <p className='text-sm text-gray-500'>Số lượng: {item.quantity}</p>
+                        {Object.keys(item.selectedOptions).length > 0 && (
+                          <div className='text-xs text-gray-400 mt-1'>
+                            {Object.entries(item.selectedOptions).map(([groupId, optionIds]) => {
+                              const group = item.product.optionGroups?.find(g => String(g.id) === groupId)
+                              if (!group) return null
+                              return (
+                                <div key={groupId}>
+                                  <span className='font-medium'>{group.name}: </span>
+                                  {optionIds.map(optionId => {
+                                    const option = group.options?.find(o => String(o.id) === optionId)
+                                    return option?.name
+                                  }).join(', ')}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )}
+                        {item.note && (
+                          <p className='text-xs text-gray-400 mt-1'>Ghi chú: {item.note}</p>
+                        )}
+                        <p className='text-pink-400 font-semibold mt-2'>{formatCurrency(item.totalPrice)}</p>
+                      </div>
+                      <div className='flex gap-1'>
+                        <button
+                          onClick={() => editCartItem(index)}
+                          className='p-2 text-blue-500 hover:bg-blue-50 rounded transition-colors'
+                          title='Chỉnh sửa'
+                        >
+                          <Pencil size={18} />
+                        </button>
+                        <button
+                          onClick={() => removeFromCart(index)}
+                          className='p-2 text-red-500 hover:bg-red-50 rounded transition-colors'
+                          title='Xóa'
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className='mt-4 pt-4'>
+                <div className='flex justify-between items-center text-lg font-bold'>
+                  <span>Tổng cộng:</span>
+                  <span className='text-pink-400'>{formatCurrency(totalCartPrice)}</span>
+                </div>
+                <button 
+                  onClick={handleContinue}
+                  className='w-full mt-4 py-3 bg-pink-400 text-white rounded-lg hover:bg-pink-500 transition-colors font-semibold'
+                >
+                  Tiếp tục
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
       {!!selectedProduct && (
-        <ProductDetailModal closeModal={closeModal} isVisible={isVisible} selectedProduct={selectedProduct} />
+        <ProductDetailModal
+          closeModal={closeModal}
+          isVisible={isVisible}
+          selectedProduct={selectedProduct}
+          onAddToCart={addToCart}
+          onUpdateCart={handleUpdateCartItem}
+          editMode={editingCartIndex !== null}
+          initialData={editingCartIndex !== null ? cart[editingCartIndex] : undefined}
+        />
       )}
     </div>
   )

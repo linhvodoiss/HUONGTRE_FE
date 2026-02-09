@@ -1,6 +1,6 @@
 // components/quantity-product.tsx
 import { Minus, Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface ProductQuantitySelectorProps {
   initialQuantity?: number
@@ -22,6 +22,11 @@ export function QuantityProduct({
   classAddName,
 }: ProductQuantitySelectorProps) {
   const [quantity, setQuantity] = useState(initialQuantity)
+
+  // Sync quantity state khi initialQuantity thay đổi (cho edit mode)
+  useEffect(() => {
+    setQuantity(initialQuantity)
+  }, [initialQuantity])
 
   const updateQuantityState = (newQuantity: number) => {
     setQuantity(newQuantity)

@@ -8,20 +8,46 @@ import { formatCurrency } from '~/utils/price-convert'
 type SelectedOptions = {
   [groupId: string]: string[]
 }
+
+type CartItem = {
+  product: ProductResponse
+  quantity: number
+  selectedOptions: {
+    [groupId: string]: string[]
+  }
+  note?: string
+  totalPrice: number
+}
+
 export default function ProductDetailModal({
   closeModal,
   selectedProduct,
   isVisible,
+  onAddToCart,
+  onUpdateCart,
+  editMode = false,
+  initialData,
 }: {
   closeModal: () => void
   isVisible: boolean
   selectedProduct: ProductResponse
+  onAddToCart: (item: CartItem) => void
+  onUpdateCart?: (item: CartItem) => void
+  editMode?: boolean
+  initialData?: CartItem
 }) {
   const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>({})
   const [selectedQuantity, setSelectedQuantity] = useState(1)
+  const [note, setNote] = useState('')
 
   useEffect(() => {
-    if (selectedProduct?.optionGroups) {
+    if (editMode && initialData) {
+      // Edit mode: khởi tạo từ dữ liệu có sẵn
+      setSelectedOptions(initialData.selectedOptions)
+      setSelectedQuantity(initialData.quantity)
+      setNote(initialData.note || '')
+    } else if (selectedProduct?.optionGroups) {
+      // Add mode: khởi tạo mặc định
       const defaultOptions: SelectedOptions = {}
       selectedProduct.optionGroups.forEach(group => {
         if (group.selectType === 'SINGLE' && group.options && group.options.length > 0) {
@@ -29,9 +55,10 @@ export default function ProductDetailModal({
         }
       })
       setSelectedOptions(defaultOptions)
+      setSelectedQuantity(1)
+      setNote('')
     }
-    setSelectedQuantity(1)
-  }, [selectedProduct])
+  }, [selectedProduct, editMode, initialData])
 
   const handleSelectOption = (groupId: string, optionId: string, selectType: 'SINGLE' | 'MULTIPLE') => {
     setSelectedOptions(prev => {
@@ -66,6 +93,26 @@ export default function ProductDetailModal({
 
     return (basePrice + toppingsPrice) * selectedQuantity
   }, [selectedProduct, selectedOptions, selectedQuantity])
+
+  const handleAddToCart = () => {
+    const cartItem: CartItem = {
+      product: selectedProduct,
+      quantity: selectedQuantity,
+      selectedOptions,
+      note: note.trim() || undefined,
+      totalPrice,
+    }
+    
+    if (editMode && onUpdateCart) {
+      // Edit mode: update item
+      onUpdateCart(cartItem)
+    } else {
+      // Add mode: add new item
+      onAddToCart(cartItem)
+    }
+    
+    closeModal()
+  }
 
 
   return (
@@ -131,12 +178,28 @@ export default function ProductDetailModal({
           ))}
 
           <div>
-            <textarea name="" id="" placeholder='Nhập ghi chú' className='p-2 border w-full outline-0 bg-gray-100 rounded-md min-h-32'></textarea>
+            <textarea
+              name=''
+              id=''
+              placeholder='Nhập ghi chú'
+              className='p-2 border w-full outline-0 bg-gray-100 rounded-md min-h-32'
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            ></textarea>
           </div>
         </div>
         <div className='absolute right-0 bottom-1/10 w-[55%] font-semibold text-white flex items-center justify-between'>
-          <QuantityProduct maxQuantity={10} onQuantityChange={setSelectedQuantity} />
-          <button className='px-4 py-2 bg-pink-400 rounded-md cursor-pointer hover:bg-pink-500 transition-all'>Thêm vào giỏ hàng: + {formatCurrency(totalPrice)}</button>
+          <QuantityProduct 
+            initialQuantity={selectedQuantity}
+            maxQuantity={10} 
+            onQuantityChange={setSelectedQuantity} 
+          />
+          <button
+            className='px-4 py-2 bg-pink-400 rounded-md cursor-pointer hover:bg-pink-500 transition-all'
+            onClick={handleAddToCart}
+          >
+            {editMode ? 'Cập nhật giỏ hàng' : 'Thêm vào giỏ hàng'}: {formatCurrency(totalPrice)}
+          </button>
         </div>
       </div>
     </div>
