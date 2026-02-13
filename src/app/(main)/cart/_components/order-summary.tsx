@@ -34,7 +34,7 @@ export default function OrderSummary({ shippingFee, onOrder }: OrderSummaryProps
         onClick={onOrder}
         disabled={cart.length === 0}
         className={`mt-4 w-full rounded-lg py-3 font-semibold text-white transition-colors ${
-          cart.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'
+          cart.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-pink-400 hover:bg-pink-500'
         }`}
       >
         Bạn muốn đặt hàng?
