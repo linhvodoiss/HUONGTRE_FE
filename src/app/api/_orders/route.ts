@@ -5,14 +5,14 @@ import { LINKS } from '~/constants/links'
 import http from '~/utils/http'
 
 export async function POST(request: NextRequest) {
-  const token = request.cookies.get(AUTH.token)?.value
+  // const token = request.cookies.get(AUTH.token)?.value
   const body = await request.json()
 
   const res = await http.post(LINKS.order, {
     body: JSON.stringify(body),
-    headers: {
-      Authorization: token ? `Bearer ${token}` : '',
-    },
+    // headers: {
+    //   Authorization: token ? `Bearer ${token}` : '',
+    // },
   })
 
   const response = NextResponse.json(res)

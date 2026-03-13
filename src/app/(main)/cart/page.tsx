@@ -15,10 +15,12 @@ import CartItems from './_components/cart-items'
 import OrderSummary from './_components/order-summary'
 import DeliveryInfo from './_components/delivery-info'
 import PickupInfo from './_components/pickup-info'
+import http from '~/utils/http'
+import { LINKS } from '~/constants/links'
 
 export default function CartPage() {
   const router = useRouter()
-  const { cart, addToCart, updateCartItem } = useCart()
+  const { cart, addToCart, updateCartItem, clearCart } = useCart()
   const [deliveryMethod, setDeliveryMethod] = useState<'delivery' | 'pickup'>('delivery')
   const [selectedProduct, setSelectedProduct] = useState<ProductResponse | null>(null)
   const [isVisible, setIsVisible] = useState(false)
@@ -124,7 +126,7 @@ export default function CartPage() {
     }, 300)
   }
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     // Check Customer Info
     const isDelivery = deliveryMethod === 'delivery'
     if (!customerInfo.name || !customerInfo.phone || (isDelivery && !customerInfo.address)) {
@@ -155,9 +157,40 @@ export default function CartPage() {
       return
     }
 
-    toast.success(`Đặt hàng thành công!\nThanh toán: ${paymentMethod === 'COD' ? 'Tiền mặt' : 'Momo'}`)
-  }
+    // ===== BUILD PAYLOAD THEO FORMAT BE =====
+    const orderPayload = {
+      receiverName: customerInfo.name,
+      receiverPhone: customerInfo.phone,
+      deliveryAddress: deliveryMethod === 'delivery' ? customerInfo.address : '',
+      note: customerInfo.detail || '',
+      items: cart.map(cartItem => ({
+        productId: Number(cartItem.product.id),
+        quantity: cartItem.quantity,
+        note: cartItem.note || '',
+        // selectedOptions: { [groupId]: [optionId, ...] } → flat array of number optionIds
+        optionIds: Object.values(cartItem.selectedOptions).flat().map(Number),
+      })),
+    }
 
+    console.log('===== [ĐẶT HÀNG] PAYLOAD GỬI LÊN BE =====')
+    console.log(JSON.stringify(orderPayload, null, 2))
+    console.log('==========================================')
+
+    try {
+      const res = await http.post(LINKS.order, {
+        baseUrl: '/api',
+        body: JSON.stringify(orderPayload)
+      })
+
+      if (res) {
+        toast.success(`Đặt hàng thành công!\nThanh toán: ${paymentMethod === 'COD' ? 'Tiền mặt' : 'Momo'}`)
+        clearCart()
+      }
+    } catch (error) {
+      toast.error('Có lỗi xảy ra khi đặt hàng, vui lòng thử lại!')
+      console.error('Call API Order Error:', error)
+    }
+  }
   return (
     <div className='min-h-screen bg-gray-100 p-4 relative'>
       <div className='mx-auto grid max-w-6xl grid-cols-1 gap-4 lg:grid-cols-3'>
